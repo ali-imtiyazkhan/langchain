@@ -1,9 +1,8 @@
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 load_dotenv()
 
-
-model = ChatOpenAI()
+model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
 while True:
     user_input = input("you : ")
