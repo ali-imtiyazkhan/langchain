@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Annotated , Optional
+from typing import Optional
 
 
 class Person(BaseModel):
@@ -14,3 +14,6 @@ print(new_person.model_dump())
 new_person1 = Person(name="Ali", city="alwer")
 
 print(new_person1.model_dump())
+
+
+# pydantic is smart enough that it will auto matcially type check and if you expected in int and but got in string it will automatcilly do type conversition.
