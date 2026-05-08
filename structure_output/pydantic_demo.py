@@ -17,3 +17,4 @@ print(new_person1.model_dump())
 
 
 # pydantic is smart enough that it will auto matcially type check and if you expected in int and but got in string it will automatcilly do type conversition.
+# email check is a build in feature in pydantic , if you pass invalid email it will raise an error.
