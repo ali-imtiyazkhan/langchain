@@ -1,0 +1,20 @@
+{
+    "title": "students",
+    "description": "schema about the student data",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "age": {
+            "type": "integer"
+        },
+        "rollno": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "name",
+        "age"
+    ]
+}
