@@ -1,6 +1,5 @@
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from dotenv import load_dotenv
-import os
 
 # Load environment variables
 load_dotenv()
@@ -13,7 +12,7 @@ embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 documents = [
     "The capital of France is Paris.",
     "The capital of Germany is Berlin.",
-    "The capital of India is New Delhi.",
+    "The capital of India is  New Delhi.",
     "The capital of Japan is Tokyo."
 ]
 
