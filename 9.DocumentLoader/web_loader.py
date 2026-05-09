@@ -1,5 +1,5 @@
 # WebBaseLoader requires beautifulsoup4 to be installed: pip install beautifulsoup4
-
+# pyrefly: ignore [missing-import]
 from langchain_community.document_loaders import WebBaseLoader
 
 # 1. Initialize the loader with a URL
