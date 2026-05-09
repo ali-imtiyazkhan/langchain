@@ -10,7 +10,7 @@ with open("example.txt") as f:
     text_data = f.read()
 
 # Initialize the Embedding Model
-embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
 # Initialize the Semantic Chunker
 # breakpoint_threshold_type can be "percentile", "standard_deviation", "interquartile"
