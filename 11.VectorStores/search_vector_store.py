@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 1. Initialize the same embedding model
+# Initialize the same embedding model
 embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
-# 2. Load the existing vector store from the local folder
+# Load the existing vector store from the local folder
 print("Loading vector store...")
 vector_store = FAISS.load_local(
     "faiss_index", 
@@ -16,7 +16,7 @@ vector_store = FAISS.load_local(
     allow_dangerous_deserialization=True
 )
 
-# 3. Perform a similarity search
+# Perform a similarity search
 # Try changing the query!
 query = input("\nEnter your search query: ")
 results = vector_store.similarity_search(query, k=2)
