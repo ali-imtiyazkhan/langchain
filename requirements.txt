@@ -28,6 +28,8 @@ scikit-learn
 faiss-cpu
 pypdf
 beautifulsoup4
+pygithub
 langchain-experimental
+langchain-chroma
 
 
