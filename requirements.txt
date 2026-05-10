@@ -29,6 +29,7 @@ faiss-cpu
 pypdf
 beautifulsoup4
 pygithub
+wikipedia
 langchain-experimental
 langchain-chroma
 
