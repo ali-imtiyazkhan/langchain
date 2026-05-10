@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 # pyrefly: ignore [missing-import]
 from langchain_community.vectorstores import FAISS
@@ -6,10 +5,10 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 load_dotenv()
 
-# 1. Initialize the embedding model
+# Initialize the embedding model
 embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 
-# 2. Load the existing vector store
+# Load the existing vector store
 print("Loading vector store (FAISS)...")
 vector_store = FAISS.load_local(
     "faiss_index", 
@@ -17,7 +16,7 @@ vector_store = FAISS.load_local(
     allow_dangerous_deserialization=True
 )
 
-# 3. Use the vector store as an MMR retriever
+# Use the vector store as an MMR retriever
 # MMR (Maximum Marginal Relevance) tries to balance relevance and diversity.
 # fetch_k: Number of documents to fetch to pass to MMR algorithm (default 20)
 # k: Number of documents to return after MMR (default 4)
@@ -33,7 +32,7 @@ retriever = vector_store.as_retriever(
     }
 )
 
-# 4. Perform retrieval
+# Perform retrieval
 query = "What is LangChain?"
 print(f"Retrieving diverse relevant chunks for: '{query}'...")
 
