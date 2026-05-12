@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import logging
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+# pyrefly: ignore [missing-import]
 from langchain.retrievers.multi_query import MultiQueryRetriever
 
 load_dotenv()
