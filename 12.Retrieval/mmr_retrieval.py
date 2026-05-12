@@ -31,7 +31,6 @@ retriever = vector_store.as_retriever(
         "lambda_mult": 0.5
     }
 )
-
 # Perform retrieval
 query = "What is LangChain?"
 print(f"Retrieving diverse relevant chunks for: '{query}'...")
