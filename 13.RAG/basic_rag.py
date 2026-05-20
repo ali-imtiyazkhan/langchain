@@ -5,16 +5,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-# Load environment variables
 load_dotenv()
 
-# 1. Initialize the embedding and chat models
-# Using gemini-1.5-flash for speed and efficiency
 embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
 model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0)
 
-# 2. Load the existing FAISS vector store
-# This assumes you have already created a vector store in the 'faiss_index' directory
+#Load the existing FAISS vector store
 print("Loading vector store from 'faiss_index'...")
 try:
     vector_store = FAISS.load_local(
@@ -27,8 +23,7 @@ except Exception as e:
     print(f"Error loading vector store: {e}")
     exit()
 
-# 3. Define the RAG prompt template
-# This tells the model to use the provided context to answer the question
+# Define the RAG prompt template
 template = """Answer the question based ONLY on the following context:
 {context}
 
