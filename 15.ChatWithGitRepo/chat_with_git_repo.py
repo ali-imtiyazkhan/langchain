@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import getpass
 from pathlib import Path
 from dotenv import load_dotenv
@@ -83,6 +84,19 @@ def get_env_or_prompt(env_key, prompt_text, secret=False):
         print(f"{C.RED}Error: {env_key} is required.{C.RESET}")
         sys.exit(1)
     return value
+
+
+# NEW: normalize full GitHub URLs to owner/repo
+def normalize_repo_input(raw):
+    raw = raw.strip().rstrip("/")
+    # Match https://github.com/owner/repo (with optional .git or sub-paths)
+    m = re.match(r"(?:https?://)?github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?(?:/.*)?$", raw, re.IGNORECASE)
+    if m:
+        return f"{m.group(1)}/{m.group(2)}"
+    # Already owner/repo format
+    if re.match(r"^[A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+$", raw):
+        return raw
+    return None
 
 
 # 2. GitHub document loader
@@ -231,13 +245,15 @@ def main():
         secret=True,
     )
 
-    # Repository details
-    repo = input(
-        f"{C.YELLOW}Repository (e.g. owner/repo-name): {C.RESET}"
+    # Repository details — accepts full URL or owner/repo
+    repo_raw = input(
+        f"{C.YELLOW}Repository (e.g. owner/repo-name or full GitHub URL): {C.RESET}"
     ).strip()
-    if not repo or "/" not in repo:
-        print(f"{C.RED}Invalid repo format. Use owner/repo-name.{C.RESET}")
+    repo = normalize_repo_input(repo_raw)
+    if not repo:
+        print(f"{C.RED}Invalid repo. Use owner/repo-name or https://github.com/owner/repo.{C.RESET}")
         sys.exit(1)
+    print(f"{C.GREY}   Using repo: {repo}{C.RESET}")
 
     branch = input(
         f"{C.YELLOW}Branch [main]: {C.RESET}"
