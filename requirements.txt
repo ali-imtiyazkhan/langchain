@@ -34,4 +34,5 @@ langchain-experimental
 langchain-chroma
 youtube-transcript-api
 pytube
+gitpython
 
