@@ -162,7 +162,7 @@ def split_documents(docs):
     return all_chunks
 
 
-# 4. Vector store
+#Vector store
 def build_vector_store(chunks):
     """Embed chunks and build an in-memory FAISS index."""
     print(f"\n{C.CYAN}[3/4] Generating embeddings and building vector index...{C.RESET}")
@@ -189,7 +189,7 @@ def build_vector_store(chunks):
     return db
 
 
-# 5. Helper function to format retrieved documents for the prompt
+#Helper function to format retrieved documents for the prompt
 def format_docs(docs):
     formatted = []
     for doc in docs:
