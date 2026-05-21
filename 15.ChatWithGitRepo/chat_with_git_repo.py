@@ -4,6 +4,7 @@ import re
 import getpass
 from pathlib import Path
 from dotenv import load_dotenv
+import base64
 
 from langchain_community.document_loaders import GithubFileLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter, Language
@@ -35,7 +36,6 @@ def banner():
 ╚══════════════════════════════════════════════════════╝{C.RESET}
 """)
 
-# Extension → LangChain Language mapping
 EXTENSION_LANGUAGE_MAP = {
     ".py":    Language.PYTHON,
     ".js":    Language.JS,
@@ -60,9 +60,19 @@ EXTENSION_LANGUAGE_MAP = {
 
 # Files / directories to skip during loading
 EXCLUDED_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp",
-    ".pdf", ".zip", ".tar", ".gz", ".exe", ".bin", ".whl",
+    # Images
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp", ".bmp", ".tiff",
+    # Archives / binaries
+    ".pdf", ".zip", ".tar", ".gz", ".exe", ".bin", ".whl", ".so", ".dll", ".dylib",
+    # Package manager locks
     ".lock", ".sum", ".mod",
+    # Fonts
+    ".ttf", ".otf", ".woff", ".woff2", ".eot",
+    # Compiled / bytecode
+    ".pyc", ".pyo", ".class", ".o",
+    # Data / ML
+    ".pkl", ".pickle", ".npy", ".npz", ".parquet",
+    ".db", ".sqlite", ".sqlite3",
 }
 EXCLUDED_DIRS = {
     ".git", "node_modules", "__pycache__", ".venv", "venv",
@@ -124,12 +134,70 @@ def load_github_documents(repo, branch, token):
     )
 
     print(f"{C.GREY}   Fetching files... this may take a moment for large repos.{C.RESET}")
-    docs = loader.load()
+
+    # Patch get_file_content_by_path to safely skip binary files
+    def safe_get_file_content(path):
+        try:
+            content_encoded = loader.get_file_contents(path)
+            return base64.b64decode(content_encoded).decode("utf-8")
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            return None
+
+    docs = []
+    skipped = 0
+
+    # Manually iterate files the same way GithubFileLoader does internally
+    for file in loader.get_file_paths():
+        if not should_include(file["path"]):
+            continue
+        try:
+            content = loader.get_file_content_by_path(file["path"])
+            if content:
+                docs.append(Document(
+                    page_content=content,
+                    metadata={"source": file["path"]}
+                ))
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            skipped += 1
+            print(f"{C.GREY}   Skipping binary file: {file['path']}{C.RESET}")
+        except Exception as e:
+            skipped += 1
+            print(f"{C.GREY}   Skipping {file['path']}: {e}{C.RESET}")
+
+    if skipped:
+        print(f"{C.YELLOW}   Skipped {skipped} binary/unreadable file(s).{C.RESET}")
+    print(f"{C.GREEN}   Loaded {len(docs)} files from GitHub.{C.RESET}")
+    return docs
+    """Load all indexable files from a GitHub repository via API."""
+    print(f"\n{C.CYAN}[1/4] Connecting to GitHub repo: {C.BOLD}{repo}{C.RESET} (branch: {branch})")
+
+    loader = GithubFileLoader(
+        repo=repo,
+        branch=branch,
+        access_token=token,
+        github_api_url="https://api.github.com",
+        file_filter=should_include,
+    )
+
+    print(f"{C.GREY}   Fetching files... this may take a moment for large repos.{C.RESET}")
+
+    docs = []
+    skipped = 0
+    for doc in loader.lazy_load():
+        try:
+            _ = doc.page_content.encode("utf-8")
+            docs.append(doc)
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            skipped += 1
+            print(f"{C.GREY}   Skipping binary file: {doc.metadata.get('source', '?')}{C.RESET}")
+
+    if skipped:
+        print(f"{C.YELLOW}   Skipped {skipped} binary/unreadable file(s).{C.RESET}")
     print(f"{C.GREEN}   Loaded {len(docs)} files from GitHub.{C.RESET}")
     return docs
 
 
-# 3. Language-aware splitting
+#Language-aware splitting
 def split_documents(docs):
     """Split each document using the appropriate language-aware splitter."""
     print(f"\n{C.CYAN}[2/4] Splitting documents into chunks...{C.RESET}")
@@ -230,7 +298,7 @@ def chat_loop(rag_chain, repo):
         print(f"{C.GREY}{'─' * 60}{C.RESET}")
 
 
-# 7. Entry point
+#Entry point
 def main():
     banner()
 
